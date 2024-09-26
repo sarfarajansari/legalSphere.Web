@@ -1,25 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from "react";
+import "./App.css";
+import Analysis from "./components/analysis/analysis";
+import { HashRouter, Route, Routes, useNavigate } from "react-router-dom";
 
-function App() {
+const Redirect = () => {
+  const navigate = useNavigate();
+  useEffect(() => {
+    navigate("/analysis/new-chat");
+  }, []);
+  return "";
+};
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <HashRouter>
+        <Routes>
+          <Route path="analysis/:id" element={<Analysis />} />
+          <Route path="*" element={<Redirect />} />
+        </Routes>
+      </HashRouter>
     </div>
   );
-}
+};
 
 export default App;
