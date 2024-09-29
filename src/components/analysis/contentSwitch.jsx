@@ -6,6 +6,9 @@ import Map from "./map";
 import Pdfview from "./pdfview";
 
 const ContentSwitch = ({ mode, data, id }) => {
+  if (id === "new-chat") {
+    return <></>;
+  }
   if (mode === "Tree" && data && data.tree) {
     return <TreeView data={data} />;
   }
