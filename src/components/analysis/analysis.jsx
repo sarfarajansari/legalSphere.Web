@@ -6,14 +6,16 @@ import { useParams } from "react-router-dom";
 import { apiClient } from "../../apiClient";
 import { message } from "antd";
 import Background from "./background";
-import Chat from "./chat";
+import Chat, { ChatProvider } from "./chat";
 import { useNavigate } from "react-router-dom";
 const Container = styled.div``;
 const Analysis = () => {
   const [mode, setMode] = useState("Tree");
   const { id } = useParams();
+  const [sendingMessage, setSendingMessage] = useState(false);
 
   const [data, setData] = useState(null);
+  const [userMessage, setUserMessage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -50,7 +52,6 @@ const Analysis = () => {
     }
   }, [id]);
 
-
   const addUserMessage = (message) => {
     setData((prev) => {
       return {
@@ -59,7 +60,6 @@ const Analysis = () => {
       };
     });
   };
-
 
   const removeUserMessage = (message) => {
     setData((prev) => {
@@ -70,53 +70,78 @@ const Analysis = () => {
     });
   };
 
-  const newChat = async (caseDetails,setTextwindow) => {
+  const newChat = async (caseDetails) => {
+    setSendingMessage(true);
     addUserMessage(caseDetails);
-    setTextwindow("");
+    setUserMessage("");
     try {
-      const res = await apiClient.post("/new-chat", { case: caseDetails }).catch((e)=>{
-        message.error("Something went wrong");
-      });
+      const res = await apiClient
+        .post("/new-chat", { case: caseDetails })
+        .catch((e) => {
+          message.error("Something went wrong");
+        });
+
+      setSendingMessage(false);
       if (!res.data) {
         return message.error("Failed to create new chat");
       }
       navigate(`/analysis/${res.data["chat_id"]}`);
     } catch (e) {
       removeUserMessage(caseDetails);
-      setTextwindow(caseDetails);
+      setSendingMessage(false);
+      setUserMessage(caseDetails);
       console.log(e);
       message.error("Something went wrong");
     }
   };
 
-  const sendUserMessage = async (message,setTextwindow) => {
-    if(id === "new-chat"){
-      return newChat(message,setTextwindow);
+  const sendUserMessage = async (msg) => {
+    if (sendingMessage) {
+      return;
     }
-    addUserMessage(message);
-    setTextwindow("");
+
+    message.info("Analyzing the case may take a few seconds");
+
+    if (id === "new-chat") {
+      return newChat(msg);
+    }
+    setSendingMessage(true);
+    addUserMessage(msg);
+    setUserMessage("");
+
     try {
-      const res = await apiClient.post(`/chat/${id}`, { message });
+      const res = await apiClient.post(`/chat/${id}`, { message: msg });
       if (!res.data) {
-        return message.error("Failed to send message");
+        return msg.error("Failed to send message");
       }
       setData(res.data);
+      setSendingMessage(false);
     } catch (e) {
-      removeUserMessage(message);
-      setTextwindow(message);
+      removeUserMessage(msg);
+      setUserMessage(msg);
       console.log(e);
-      message.error("Something went wrong");
+      msg.error("Something went wrong");
+      setSendingMessage(false);
     }
   };
   return (
     <Container>
-      <Background>
-        {data && <ContentSwitch mode={mode} data={data} />}
-      </Background>
-      <ViewSwitch setMode={setMode} />
+      <ChatProvider
+        value={{
+          sendUserMessage,
+          setUserMessage,
+          userMessage,
+          sending: sendingMessage,
+          setSending: setSendingMessage,
+        }}
+      >
+        <Background mode={mode}>
+          {data && <ContentSwitch mode={mode} data={data} id={id} />}
+        </Background>
+        <ViewSwitch setMode={setMode} mode={mode} />
 
-      <Chat data={data} sendUserMessage={sendUserMessage} />
-      
+        <Chat data={data} sendUserMessage={sendUserMessage} />
+      </ChatProvider>
     </Container>
   );
 };

@@ -13,6 +13,13 @@ const Container = styled.div`
       left: 125px;
       right: 25px;
       bottom: 25px;
+
+      &.map {
+        top: 50px;
+        border: 4px solid white;
+        border-radius: 19px;
+        overflow: hidden;
+      }
     }
 
     img {
@@ -26,7 +33,8 @@ const Container = styled.div`
     left: 0;
     right: 0;
     bottom: 0;
-    background: #000;
+    background: linear-gradient(117.34deg, #0e6660 5.21%, #082e45 94.77%);
+
     z-index: -1;
   }
   .topleft-bg {
@@ -90,7 +98,24 @@ const Container = styled.div`
     }
   }
 `;
-const Background = ({children}) => {
+const Background = ({ children, mode }) => {
+  if (mode === "Map") {
+    return (
+      <Container>
+        <div className="logo">
+          <img src="/logo.png" alt="Logo" />
+        </div>
+        <div className="blackbg"></div>
+        <div className="topleft-bg">
+          <img src="/frame1.png" alt="Frame1" />
+        </div>
+
+        <div className="main">
+          <div className="content map">{children}</div>
+        </div>
+      </Container>
+    );
+  }
   return (
     <Container>
       <div className="logo">
@@ -100,9 +125,7 @@ const Background = ({children}) => {
       <div className="topleft-bg">
         <img src="/frame1.png" alt="Frame1" />
       </div>
-      <div className="topright-bg">
-        <img src="/frame2.png" alt="Frame2" />
-      </div>
+
       <div className="right-bg">
         <img src="/frame3.png" alt="Frame3" />
       </div>
@@ -112,9 +135,7 @@ const Background = ({children}) => {
 
       <div className="main">
         <img src="/mainbg.png" alt="Main" />
-        <div className="content">
-            {children}
-        </div>
+        <div className="content">{children}</div>
       </div>
     </Container>
   );

@@ -26,32 +26,34 @@ const Container = styled.div`
 const Views = [
   {
     name: "Tree",
-    img: "viewicons/tree.png",
+    img: "tree.png",
   },
   {
     name: "Evidence Board",
-    img: "viewicons/board.png",
+    img: "board.png",
   },
   {
     name: "Map",
-    img: "viewicons/map.png",
+    img: "map.png",
   },
   {
     name: "Timeline",
-    img: "viewicons/timeline.png",
+    img: "timeline.png",
   },
   {
     name: "pdf",
-    img: "viewicons/pdf.png",
+    img: "pdf.png",
   },
 ];
-const ViewSwitch = ({ setMode }) => {
+const ViewSwitch = ({ setMode, mode }) => {
   return (
     <Container>
       {Views.map((view, index) => (
         <img
           key={index}
-          src={view.img}
+          src={`/${view.name === mode ? "activeicons" : "viewicons"}/${
+            view.img
+          }`}
           alt={view.name}
           onClick={() => setMode(view.name)}
         />

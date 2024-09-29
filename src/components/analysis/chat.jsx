@@ -7,6 +7,16 @@ import { message } from "antd";
 import Markdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 
+const ChatContext = React.createContext({
+  sendUserMessage: async () => {},
+  setUserMessage: () => {},
+  userMessage: "",
+  sending: false,
+  setSending: () => {},
+});
+export const ChatProvider = ChatContext.Provider;
+export const useChat = () => React.useContext(ChatContext);
+
 const Container = styled.div`
   background-color: rgba(255, 255, 255, 0.04);
   aspect-ratio: 13/16;
@@ -165,10 +175,10 @@ const Container = styled.div`
     }
   }
 `;
-const Chat = ({ data, sendUserMessage }) => {
+const Chat = ({ data }) => {
   const scrollRef = useRef();
-  const [sending, setSending] = useState(false);
-  const [userMessage, setUserMessage] = useState("");
+
+  const { userMessage, setUserMessage, sendUserMessage, sending } = useChat();
 
   const chatData = useMemo(() => {
     if (data) {
@@ -189,21 +199,12 @@ const Chat = ({ data, sendUserMessage }) => {
   }, [chatData]);
 
   const sendMessage = async () => {
-    if (sending) {
-      return;
-    }
-
     if (!userMessage) {
       message.error("Message cannot be empty");
       return;
     }
-    message.info("Analyzing the case may take a few seconds");
-
-    setSending(true);
 
     await sendUserMessage(userMessage, setUserMessage);
-
-    setSending(false);
   };
 
   return (

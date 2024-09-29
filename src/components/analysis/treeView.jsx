@@ -6,13 +6,23 @@ import {
   Handle,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useMemo } from "react";
+import { Button } from "antd";
+import { useCallback, useMemo } from "react";
 import ContentEditable from "react-contenteditable";
 import styled from "styled-components";
+import { useChat } from "./chat";
 
 const rootNodeHandles = ["a", "b", "c", "d", "e", "f", "g", "h", "i"];
 const allHandles = [
-  ...rootNodeHandles,
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "f",
+  "g",
+  "h",
+  "i",
   "j",
   "k",
   "l",
@@ -270,8 +280,8 @@ const TreeView = ({ data }) => {
   return (
     <div style={{ height: "100%" }}>
       <ReactFlow
-        nodes={nodes}
-        edges={edges}
+        defaultNodes={nodes}
+        defaultEdges={edges}
         minZoom={0.001}
         nodeTypes={{
           root: RootNode,
@@ -337,9 +347,9 @@ const LabelNode = ({ data }) => {
 };
 
 const StringNodeContainer = styled.div`
-  background: rgba(115, 236, 210, 1);
+    background: #d0d76b;
   font-size: 10px;
-  padding: 4px;
+  padding: 10px;
   border-radius: 8px;
   box-shadow: 0px 7.36px 7.36px 0px #00000040;
   min-width: 180px;
@@ -364,7 +374,7 @@ const StringNode = ({ data }) => {
 };
 
 const ListNodeContainer = styled.div`
-  background: #dddcf1;
+  background: #103818;
   font-size: 10px;
   padding: 4px;
   border-radius: 8px;
@@ -373,7 +383,7 @@ const ListNodeContainer = styled.div`
 
   max-width: 400px;
   h2 {
-    color: blue;
+    color: #f2f2f2;
   }
   text-align: center;
   text-wrap: wrap;
@@ -383,7 +393,7 @@ const ListNodeContainer = styled.div`
   .home-list {
     list-style: none;
     width: 350px;
-    background: #ecf5ff;
+    background: #d0d76b;
     padding: 30px;
     border-radius: 4px;
 
@@ -392,15 +402,15 @@ const ListNodeContainer = styled.div`
     }
     li:nth-child(odd) {
       text-align: left;
-      border-left: 10px solid #1488f3;
+      border-left: 10px solid rgb(0, 0, 0);
       padding-left: 4px;
-      border-bottom: 10px solid #86bfff;
+      border-bottom: 10px solid #4c5764;
     }
     li:nth-child(even) {
       text-align: right;
-      border-right: 10px solid #1488f3;
+      border-right: 10px solid rgb(0, 0, 0);
       padding-right: 4px;
-      border-bottom: 10px solid #86bfff;
+      border-bottom: 10px solid #4c5764;
     }
   }
 `;
@@ -412,9 +422,15 @@ const ListNode = ({ data }) => {
       <h2>{data.label}</h2>
       <br />
       <ul className="home-list">
-        {data.list.map((item) => {
+        {data.list.map((item, i) => {
           return (
-            <li>
+            <li
+              style={
+                i === data.list.length - 1 && data.list.length > 1
+                  ? { borderBottom: "none" }
+                  : {}
+              }
+            >
               {/* <ContentEditable html={item}  /> */}
               {item}
             </li>
@@ -426,16 +442,17 @@ const ListNode = ({ data }) => {
 };
 
 const TableViewContainer = styled.div`
-  background: #dddcf1;
+  background: #103818;
+  color: white;
   font-size: 10px;
-  padding: 4px;
+  padding-top: 10px;
   border-radius: 8px;
   box-shadow: 0px 7.36px 7.36px 0px #50585e40;
   min-width: 180px;
 
   max-width: 600px;
   h2 {
-    color: blue;
+    color: #ffffff;
   }
   text-align: center;
   text-wrap: wrap;
@@ -443,21 +460,22 @@ const TableViewContainer = styled.div`
   border-radius: 10px;
 
   table {
-    background: #012b39;
+    background: #d0d76b;
     border-radius: 0.25em;
     border-collapse: collapse;
-    margin: 1em;
+    /* margin: 1em; */
+    border-radius: 10px;
   }
   th {
     border-bottom: 1px solid #364043;
-    color: #e2b842;
+    color: black;
     font-size: 0.85em;
     font-weight: 600;
     padding: 0.5em 1em;
     text-align: left;
   }
   td {
-    color: #fff;
+    color: black;
     font-weight: 400;
     padding: 0.65em 1em;
   }
@@ -468,11 +486,42 @@ const TableViewContainer = styled.div`
     transition: background 0.25s ease;
   }
   tbody tr:hover {
-    background: #014055;
+    background:#a5ac37;
   }
 `;
 
+const getKey = (key) => {
+  if (key === "filelink") {
+    return "Read More...";
+  }
+  return key;
+};
 const TableView = ({ data }) => {
+  const chat = useChat();
+  const onClickCell = (index, key) => {
+    if (data.label === "Pastjudgments") {
+      console.log("clicked", index, key);
+      //past judgement table
+      if (key === "filelink" && data.table[index]?.citation) {
+        let userPrompt = "Tell me more about " + data.table[index].citation;
+        chat.sendUserMessage(userPrompt);
+      }
+    }
+  };
+
+  const getContent = useCallback(
+    (index, key) => {
+      if (data.label === "Pastjudgments") {
+        if (key === "filelink") {
+          return <Button type="link">Read More...</Button>;
+        }
+      }
+
+      return data.table[index][key];
+    },
+    [data.table, data.label]
+  );
+
   return (
     <TableViewContainer>
       <Handle type="target" position={Position.Top} id="a" />
@@ -482,16 +531,20 @@ const TableView = ({ data }) => {
         <thead>
           <tr>
             {Object.keys(data.table[0]).map((key) => {
-              return <th>{snakeCaseToLabel(key)}</th>;
+              return <th>{snakeCaseToLabel(getKey(key))}</th>;
             })}
           </tr>
         </thead>
         <tbody>
-          {data.table.map((row) => {
+          {data.table.map((row, index) => {
             return (
               <tr>
                 {Object.keys(row).map((key) => {
-                  return <td>{row[key]}</td>;
+                  return (
+                    <td onClick={() => onClickCell(index, key)}>
+                      {getContent(index, key)}
+                    </td>
+                  );
                 })}
               </tr>
             );
