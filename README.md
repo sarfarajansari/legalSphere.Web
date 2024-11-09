@@ -47,3 +47,8 @@ LegalSphere generates a detailed **PDF summary** of the case analysis, capturing
 ## Intended Users
 LegalSphere is primarily designed for **lawyers**, **legal researchers**, and **academics**. However, its structured analysis and comprehensive data make it a valuable tool for anyone interested in legal case research and analysis.
 
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
