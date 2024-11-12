@@ -10,7 +10,7 @@ import Chat, { ChatProvider } from "./chat";
 import { useNavigate } from "react-router-dom";
 const Container = styled.div``;
 const Analysis = () => {
-  const [mode, setMode] = useState("Tree");
+  const [mode, setMode] = useState("");
   const { id } = useParams();
   const [sendingMessage, setSendingMessage] = useState(false);
 

@@ -78,7 +78,7 @@ const LocationEvent = ({
         children: item,
       };
     });
-  }, []);
+  }, [location]);
 
   return (
     <Container
@@ -96,19 +96,21 @@ const LocationEvent = ({
       <h4>{location?.description}</h4>
 
       <br />
-      <div className="eventlist">
-        <h3>Events</h3>
-        <br />
-        <Timeline>
-          {events.map((item) => {
-            return (
-              <Timeline.Item>
-                <div className="item">{item.children}</div>
-              </Timeline.Item>
-            );
-          })}
-        </Timeline>
-      </div>
+      {events.length > 0 && (
+        <div className="eventlist">
+          <h3>Events</h3>
+          <br />
+          <Timeline>
+            {events.map((item) => {
+              return (
+                <Timeline.Item>
+                  <div className="item">{item.children}</div>
+                </Timeline.Item>
+              );
+            })}
+          </Timeline>
+        </div>
+      )}
     </Container>
   );
 };

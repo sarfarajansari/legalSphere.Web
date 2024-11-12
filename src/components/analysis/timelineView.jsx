@@ -71,13 +71,29 @@ const Container = styled.div`
 `;
 
 const TimelineView = ({ data }) => {
+  const addtionalDates = [
+    "December",
+    " November",
+    "October",
+    "September",
+    "August",
+    "July",
+    "June",
+    "May",
+    "April",
+    "March",
+    "February",
+    "January",
+  ];
   const timelinedata = useMemo(() => {
     if (!data) return [];
+
     const timeLines = data.timeline.map((event) => {
       return {
         ...event,
 
         dateobj: detectAndConvertDate(event.time),
+        time: event?.time || addtionalDates.pop() + ", 2024",
       };
     });
 
